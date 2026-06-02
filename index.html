@@ -1,13 +1,513 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>PetCare - Cadastro de Pets</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 2rem;
+        }
+
+        /* Cabeçalho */
+        header {
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        /* Layout Principal */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        /* Cartões */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Formulário */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Lista de Pets */
+        .pet-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            .pet-list {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .pet-item {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .pet-name-species {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pet-emoji {
+            font-size: 1.5rem;
+        }
+
+        .pet-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .pet-details {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .pet-actions {
+            margin-top: auto;
+            padding-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            width: auto;
+        }
+
+        .btn-danger {
+            background-color: white;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-edit {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-edit:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state span {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        /* Notificação (Toast) */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body>
-    <h1>Aula Git</h1>
-    <p>aula git com github</p>
 
+    <header>
+        <h1>🐾 PetCare</h1>
+        <p>Sistema simples de registro de animais</p>
+    </header>
+
+    <div class="container">
+        <!-- Coluna Esquerda: Formulário -->
+        <aside class="card">
+            <h2 id="form-title">Novo Cadastro</h2>
+            <form id="pet-form">
+                <!-- Campo Oculto para ID (usado na edição) -->
+                <input type="hidden" id="pet-id">
+
+                <div class="form-group">
+                    <label for="nome">Nome do Pet</label>
+                    <input type="text" id="nome" placeholder="Ex: Rex" required>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="especie">Espécie</label>
+                        <select id="especie" required>
+                            <option value="" disabled selected>Selecione...</option>
+                            <option value="Cao">Cachorro</option>
+                            <option value="Gato">Gato</option>
+                            <option value="Passaro">Pássaro</option>
+                            <option value="Roedor">Roedor</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="idade">Idade</label>
+                        <input type="number" id="idade" placeholder="Anos" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="raca">Raça</label>
+                    <input type="text" id="raca" placeholder="Ex: Poodle" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dono">Nome do Tutor</label>
+                    <input type="text" id="dono" placeholder="Seu nome" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefone">Telefone</label>
+                    <input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submit-btn">Salvar Pet</button>
+                <button type="button" class="btn-edit" id="cancel-edit-btn" style="display: none; margin-top: 0.5rem;">Cancelar Edição</button>
+            </form>
+        </aside>
+
+        <!-- Coluna Direita: Lista de Pets -->
+        <main class="card">
+            <h2>Pets Cadastrados (<span id="pet-count">0</span>)</h2>
+            <div class="pet-list" id="pet-list">
+                <!-- Os pets serão renderizados aqui pelo JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Elemento de Notificação -->
+    <div id="toast" class="toast">Mensagem de sucesso!</div>
+
+    <script>
+        // --- ESTADO DA APLICAÇÃO (Em Memória) ---
+        let pets = [];
+
+        // --- REFERÊNCIAS DO DOM ---
+        const petForm = document.getElementById('pet-form');
+        const petListContainer = document.getElementById('pet-list');
+        const petCount = document.getElementById('pet-count');
+        const toast = document.getElementById('toast');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const formTitle = document.getElementById('form-title');
+
+        // Campos do formulário
+        const idInput = document.getElementById('pet-id');
+        const nomeInput = document.getElementById('nome');
+        const especieInput = document.getElementById('especie');
+        const idadeInput = document.getElementById('idade');
+        const racaInput = document.getElementById('raca');
+        const donoInput = document.getElementById('dono');
+        const telefoneInput = document.getElementById('telefone');
+
+        // --- DICIONÁRIO DE EMOJIS POR ESPÉCIE ---
+        const emojis = {
+            'Cao': '🐶',
+            'Gato': '🐱',
+            'Passaro': '🦜',
+            'Roedor': '🐹',
+            'Outro': '🐾'
+        };
+
+        // --- FUNÇÕES PRINCIPAIS ---
+
+        // Renderizar a lista de pets no HTML
+        function renderPets() {
+            petListContainer.innerHTML = ''; // Limpa a lista atual
+            petCount.textContent = pets.length;
+
+            if (pets.length === 0) {
+                petListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <span>💤</span>
+                        <p>Nenhum pet cadastrado ainda.</p>
+                        <p>Use o formulário ao lado para adicionar o primeiro!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            pets.forEach(pet => {
+                const petElement = document.createElement('div');
+                petElement.className = 'pet-item';
+                
+                petElement.innerHTML = `
+                    <div class="pet-header">
+                        <div class="pet-name-species">
+                            <span class="pet-emoji">${emojis[pet.especie] || '🐾'}</span>
+                            <span class="pet-name">${pet.nome}</span>
+                        </div>
+                        <span class="pet-details"><strong>${pet.idade}</strong> anos</span>
+                    </div>
+                    <div class="pet-details">
+                        <p><strong>Raça:</strong> ${pet.raca}</p>
+                        <p><strong>Tutor:</strong> ${pet.dono}</p>
+                        <p><strong>Contato:</strong> ${pet.telefone}</p>
+                    </div>
+                    <div class="pet-actions">
+                        <button class="btn-small btn-edit" onclick="editPet('${pet.id}')">Editar</button>
+                        <button class="btn-small btn-danger" onclick="deletePet('${pet.id}')">Excluir</button>
+                    </div>
+                `;
+                
+                petListContainer.appendChild(petElement);
+            });
+        }
+
+        // Adicionar ou Atualizar um Pet
+        petForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Previne o recarregamento da página
+
+            const petData = {
+                id: idInput.value || Date.now().toString(), // Gera um ID único se for novo
+                nome: nomeInput.value.trim(),
+                especie: especieInput.value,
+                idade: idadeInput.value,
+                raca: racaInput.value.trim(),
+                dono: donoInput.value.trim(),
+                telefone: telefoneInput.value.trim()
+            };
+
+            if (idInput.value) {
+                // Modo Edição: atualiza o pet existente
+                const index = pets.findIndex(p => p.id === idInput.value);
+                if (index !== -1) {
+                    pets[index] = petData;
+                    showToast('Pet atualizado com sucesso!', '#3b82f6'); // Azul para edição
+                }
+                resetFormState();
+            } else {
+                // Modo Criação: adiciona um novo
+                pets.push(petData);
+                showToast('Pet cadastrado com sucesso!', '#10b981'); // Verde para criação
+            }
+
+            petForm.reset();
+            renderPets();
+        });
+
+        // Deletar um Pet
+        window.deletePet = function(id) {
+            // Remove o pet filtrando o array
+            pets = pets.filter(pet => pet.id !== id);
+            
+            // Se estava editando o pet que foi excluído, reseta o form
+            if(idInput.value === id) {
+                resetFormState();
+                petForm.reset();
+            }
+
+            renderPets();
+            showToast('Pet removido.', '#ef4444'); // Vermelho para exclusão
+        };
+
+        // Preparar formulário para edição
+        window.editPet = function(id) {
+            const pet = pets.find(p => p.id === id);
+            if (!pet) return;
+
+            // Preenche o formulário
+            idInput.value = pet.id;
+            nomeInput.value = pet.nome;
+            especieInput.value = pet.especie;
+            idadeInput.value = pet.idade;
+            racaInput.value = pet.raca;
+            donoInput.value = pet.dono;
+            telefoneInput.value = pet.telefone;
+
+            // Altera a interface para modo de edição
+            formTitle.textContent = 'Editar Cadastro';
+            submitBtn.textContent = 'Atualizar Pet';
+            cancelEditBtn.style.display = 'block';
+            
+            // Rola a página para cima no celular para focar no formulário
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Cancelar edição
+        cancelEditBtn.addEventListener('click', function() {
+            resetFormState();
+            petForm.reset();
+        });
+
+        // Reseta a interface do formulário para o estado padrão (Novo Cadastro)
+        function resetFormState() {
+            idInput.value = '';
+            formTitle.textContent = 'Novo Cadastro';
+            submitBtn.textContent = 'Salvar Pet';
+            cancelEditBtn.style.display = 'none';
+        }
+
+        // Exibir Notificação temporária
+        let toastTimeout;
+        function showToast(message, bgColor) {
+            toast.textContent = message;
+            toast.style.backgroundColor = bgColor;
+            toast.classList.add('show');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- INICIALIZAÇÃO ---
+        renderPets();
+
+    </script>
 </body>
 </html>
